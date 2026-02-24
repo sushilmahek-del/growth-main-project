@@ -31,18 +31,24 @@ export default function SignupPage() {
       const { data, error } = await signUp(email, password, fullName)
 
       if (error) {
-        setError(error.message)
+        setError(error.message || 'Failed to create account')
+        setLoading(false)
         return
       }
 
       if (data?.user) {
-        setSuccess('Account created successfully! Please check your email to verify.')
+        // For development/testing, auto-redirect if email confirmation is disabled
+        setSuccess('Account created successfully!')
+        
+        // Check if email confirmation is required (will be enabled in production)
+        // If confirmation is disabled, we can auto-login after a short delay
         setTimeout(() => {
           router.push('/auth/login')
-        }, 2000)
+        }, 1500)
       }
-    } catch (err) {
-      setError('An unexpected error occurred')
+    } catch (err: any) {
+      console.error('[v0] Signup error:', err)
+      setError(err?.message || 'An unexpected error occurred during signup')
     } finally {
       setLoading(false)
     }
